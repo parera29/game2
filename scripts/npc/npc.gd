@@ -36,6 +36,8 @@ var _last_progress_pos := Vector3.ZERO
 var _greet_cooldown := 0.0
 var _anim_speed := 0.0
 var _gravity := 18.0
+var _deal_travel := 0.0
+var _hours_check := 0.0
 
 
 func setup(id: String, p_name: String, p_role: String, p_district: String, p_look: Dictionary) -> void:
@@ -94,6 +96,10 @@ func _physics_process(delta: float) -> void:
 				_choose_next_activity()
 		"walk", "go_deal", "go_home", "return":
 			_follow_path(delta)
+			if state == "go_deal":
+				_deal_travel += delta
+				if _deal_travel > 75.0 and dist_player > 30.0:
+					_snap_to_deal()
 		"wait_deal":
 			velocity.x = 0.0
 			velocity.z = 0.0
@@ -298,6 +304,18 @@ func _go_to_deal() -> void:
 	set_path(GameState.world.nav.find_path(global_position, mp["pos"]))
 	state = "go_deal"
 	move_speed = WALK * 1.3
+	_deal_travel = 0.0
+
+
+## Si el cliente se atasca de camino a la cita, aparece en el punto de encuentro
+## (solo cuando el jugador no está cerca para verlo).
+func _snap_to_deal() -> void:
+	var mp: Dictionary = GameState.world.get_meeting_point_data(String(Customers.get_deal(npc_id).get("location", "")))
+	if mp.is_empty():
+		return
+	global_position = (mp["pos"] as Vector3) + Vector3.UP * 0.1
+	path_i = path.size()
+	_arrived()
 
 
 func on_deal_scheduled() -> void:
@@ -336,6 +354,15 @@ func refresh_marker() -> void:
 func _static_behaviour(delta: float, player: Node3D, dist: float) -> void:
 	velocity.x = 0.0
 	velocity.z = 0.0
+	_hours_check -= delta
+	if _hours_check <= 0.0:
+		_hours_check = 1.0
+		var on_shift := _is_active_hour() or talking
+		if visible != on_shift:
+			visible = on_shift
+			collision_layer = Geo.LAYER_NPC if on_shift else 0
+	if not visible:
+		return
 	if global_position.distance_to(anchor) > 0.5:
 		global_position = anchor
 	if player and dist < 4.0 and not talking:

@@ -14,13 +14,22 @@ func _ready() -> void:
 		helper.set_script(load("res://tests/screenshot_runner.gd"))
 		helper.name = "ScreenshotHelper"
 		get_tree().root.add_child.call_deferred(helper)
-		SaveSystem.new_game.call_deferred()
+		if args.size() > 0 and args[0] == "menu":
+			get_tree().change_scene_to_file.call_deferred("res://scenes/main_menu.tscn")
+		else:
+			SaveSystem.new_game.call_deferred()
 
 
 func _process(_delta: float) -> void:
 	if scene_file_path != "":
 		return
 	_frames += 1
+	if _frames == 50 and args.size() > 9 and args[9] == "talk":
+		for n in GameState.world.npc_root.get_children():
+			if n.npc_id == args[10]:
+				n.interact(GameState.player)
+	if _frames == 8 and args.size() > 9 and args[9] == "unlock":
+		GameState.add_xp(9000)
 	if _frames == 10 and GameState.player and args.size() >= 6:
 		GameState.player.teleport(Vector3(float(args[0]), float(args[1]), float(args[2])), deg_to_rad(float(args[3])))
 		GameState.player.head.rotation.x = deg_to_rad(float(args[4]))
@@ -28,10 +37,10 @@ func _process(_delta: float) -> void:
 	if _frames == 60 and args.size() > 7 and args[7] != "":
 		var ui := get_tree().get_first_node_in_group("ui_manager")
 		if ui:
-			ui.open(args[7], {"app": args[8]} if args.size() > 8 else {})
+			ui.open(args[7], {"app": args[8], "shop": args[8]} if args.size() > 8 else {})
 	if _frames == 90:
 		var img := get_viewport().get_texture().get_image()
-		var out := args[6] if args.size() > 6 else "user://shot.png"
+		var out := args[6] if args.size() > 6 else (args[1] if args.size() > 1 else "user://shot.png")
 		img.save_png(out)
 		print("SHOT_SAVED ", out)
 		get_tree().quit()

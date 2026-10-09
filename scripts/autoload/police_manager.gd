@@ -14,6 +14,7 @@ var last_seen_abs: int = -9999
 var searching_officer: Node = null
 var search_timer := 0.0
 var crackdown_until: int = 0
+var cleared_until: int = 0            # tras un registro limpio no vuelven a pararte durante un rato
 var _pending_reports: Array = []      # [{"at": abs_minute, "pos": Vector3, "severity": float}]
 var _rng := RandomNumberGenerator.new()
 
@@ -31,6 +32,7 @@ func reset() -> void:
 	searching_officer = null
 	search_timer = 0.0
 	crackdown_until = 0
+	cleared_until = 0
 	_pending_reports.clear()
 	_emit()
 
@@ -120,8 +122,8 @@ func officer_sees_player(cop: Node) -> void:
 	if searching_officer != null and is_instance_valid(searching_officer):
 		return
 	var outside: bool = GameState.player != null and not GameState.player.get("is_indoors")
-	var curfew_violation: bool = GameState.is_curfew() and outside
-	if suspicion >= 50.0 or wanted == Wanted.INVESTIGATING or curfew_violation:
+	var curfew_violation: bool = GameState.is_curfew() and outside and GameState.absolute_minute() > cleared_until
+	if (suspicion >= 50.0 and GameState.absolute_minute() > cleared_until) or wanted == Wanted.INVESTIGATING or curfew_violation:
 		if curfew_violation and wanted == Wanted.NONE:
 			Events.toast("Toque de queda (22:00-05:00): un agente quiere hablar contigo.", "police")
 		set_wanted(maxi(wanted, Wanted.INVESTIGATING))
@@ -183,9 +185,11 @@ func _finish_search() -> void:
 		Events.toast("El agente ha encontrado material ilegal.", "police")
 		arrest()
 	else:
-		Events.toast("Registro limpio. \"Circule.\"", "info")
+		Events.toast("Registro limpio. \"Circule, y váyase a casa.\"", "info")
 		suspicion = maxf(0.0, suspicion - 30.0)
-		set_wanted(Wanted.NONE)
+		cleared_until = GameState.absolute_minute() + 120
+		wanted = Wanted.NONE
+		_emit()
 		if is_instance_valid(cop):
 			cop.call("resume_patrol")
 
@@ -271,11 +275,12 @@ func _on_day_started(_day: int) -> void:
 # ------------------------------------------------------------------ Persistencia
 
 func to_dict() -> Dictionary:
-	return {"suspicion": suspicion, "crackdown_until": crackdown_until}
+	return {"suspicion": suspicion, "crackdown_until": crackdown_until, "cleared_until": cleared_until}
 
 
 func from_dict(d: Dictionary) -> void:
 	reset()
 	suspicion = float(d.get("suspicion", 0.0))
 	crackdown_until = int(d.get("crackdown_until", 0))
+	cleared_until = int(d.get("cleared_until", 0))
 	_emit()

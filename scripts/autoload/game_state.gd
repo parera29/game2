@@ -247,9 +247,10 @@ func add_xp(amount: int) -> void:
 	var new_rank := rank
 	while new_rank + 1 < RANKS.size() and xp >= int(RANKS[new_rank + 1]["xp"]):
 		new_rank += 1
-	Events.xp_changed.emit(xp, new_rank)
-	if new_rank != rank:
-		rank = new_rank
+	var ranked_up := new_rank != rank
+	rank = new_rank
+	Events.xp_changed.emit(xp, rank)
+	if ranked_up:
 		Audio.play("quest")
 		Events.toast("¡Nuevo rango: %s!" % rank_name(), "quest")
 		Events.rank_changed.emit(rank)

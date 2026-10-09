@@ -27,6 +27,7 @@ func build() -> void:
 	body.add_child(tabs)
 	var buy_scroll := ScrollContainer.new()
 	buy_scroll.name = "Comprar"
+	buy_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	tabs.add_child(buy_scroll)
 	_list = VBoxContainer.new()
 	_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -34,6 +35,7 @@ func build() -> void:
 	if not (shop.get("buys", []) as Array).is_empty():
 		var sell_scroll := ScrollContainer.new()
 		sell_scroll.name = "Vender"
+		sell_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 		tabs.add_child(sell_scroll)
 		_sell_list = VBoxContainer.new()
 		_sell_list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -73,7 +75,7 @@ func _refresh() -> void:
 
 func _row_base(id: String) -> HBoxContainer:
 	var h := HBoxContainer.new()
-	h.custom_minimum_size = Vector2(680, 56)
+	h.custom_minimum_size = Vector2(0, 56)
 	var icon := TextureRect.new()
 	icon.texture = ItemDB.get_icon(id)
 	icon.custom_minimum_size = Vector2(48, 48)
@@ -87,7 +89,7 @@ func _row_base(id: String) -> HBoxContainer:
 	v.add_child(UITheme.label(ItemDB.display_name(id), 17, UITheme.TEXT))
 	var d := UITheme.label(String(ItemDB.get_prop(id, "desc", "")), 13, UITheme.TEXT_DIM)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	d.custom_minimum_size = Vector2(360, 0)
+	d.custom_minimum_size = Vector2(260, 0)
 	v.add_child(d)
 	return h
 
@@ -107,9 +109,9 @@ func _buy_row(id: String) -> Control:
 	spin.min_value = 1
 	spin.max_value = maxi(1, ItemDB.max_stack(id))
 	spin.value = 1
-	spin.custom_minimum_size = Vector2(90, 0)
+	spin.custom_minimum_size = Vector2(80, 0)
 	h.add_child(spin)
-	h.add_child(UITheme.button("Comprar", func() -> void: _buy(id, int(spin.value)), 110))
+	h.add_child(UITheme.button("Comprar", func() -> void: _buy(id, int(spin.value)), 96))
 	return h
 
 

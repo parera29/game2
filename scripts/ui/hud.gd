@@ -74,6 +74,7 @@ func _ready() -> void:
 	Events.notify.connect(_on_notify)
 	Events.money_changed.connect(func(_c: int, _b: int) -> void: _refresh_money())
 	Events.xp_changed.connect(func(_x: int, _r: int) -> void: _refresh_money())
+	Events.rank_changed.connect(func(_r: int) -> void: _refresh_money())
 	Events.heat_changed.connect(func(_s: float, _w: int) -> void: _refresh_heat())
 	Events.quest_started.connect(func(_q: String) -> void: _refresh_quest())
 	Events.quest_updated.connect(func(_q: String) -> void: _refresh_quest())
