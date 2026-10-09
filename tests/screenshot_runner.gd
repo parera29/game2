@@ -24,6 +24,29 @@ func _process(_delta: float) -> void:
 	if scene_file_path != "":
 		return
 	_frames += 1
+	if _frames == 5:
+		for a in args:
+			if a.begins_with("set:"):
+				var kv := a.substr(4).split("=")
+				Settings.set_value(kv[0], int(kv[1]) if kv[1].is_valid_int() else (kv[1] == "true" if kv[1] in ["true", "false"] else float(kv[1])))
+	if _frames == 30:
+		var scene := get_tree().current_scene
+		for a in args:
+			match a:
+				"noenv":
+					for n in scene.find_children("*", "WorldEnvironment", true, false):
+						n.queue_free()
+				"nocity":
+					scene.get_node("World/City").visible = false
+				"nonpc":
+					scene.get_node("World/NPCs").visible = false
+				"nolights":
+					for n in scene.find_children("*", "Light3D", true, false):
+						if not (n is DirectionalLight3D):
+							n.queue_free()
+				"nosun":
+					for n in scene.find_children("*", "DirectionalLight3D", true, false):
+						n.queue_free()
 	if _frames == 50 and args.size() > 9 and args[9] == "talk":
 		for n in GameState.world.npc_root.get_children():
 			if n.npc_id == args[10]:
@@ -48,6 +71,8 @@ func _process(_delta: float) -> void:
 		var ui := get_tree().get_first_node_in_group("ui_manager")
 		if ui:
 			ui.open(args[7], {"app": args[8], "shop": args[8]} if args.size() > 8 else {})
+	if _frames == 85:
+		print("RINFO objetos=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_OBJECTS_IN_FRAME), " draws=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_DRAW_CALLS_IN_FRAME), " prims=", RenderingServer.get_rendering_info(RenderingServer.RENDERING_INFO_TOTAL_PRIMITIVES_IN_FRAME), " cam=", get_viewport().get_camera_3d(), " far=", get_viewport().get_camera_3d().far if get_viewport().get_camera_3d() else 0.0, " vpsize=", get_viewport().size, " scale3d=", get_viewport().scaling_3d_scale)
 	if _frames == 90:
 		var img := get_viewport().get_texture().get_image()
 		var out := args[6] if args.size() > 6 else (args[1] if args.size() > 1 else "user://shot.png")
