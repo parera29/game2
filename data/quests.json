@@ -1,0 +1,171 @@
+{
+  "q_welcome": {
+    "title": "Bienvenido a Redmont", "kind": "main", "giver": "marco", "auto": true,
+    "desc": "Acabas de llegar a Redmont sin nada. Marco, un viejo conocido, te espera en el Lucky Diner.",
+    "objectives": [
+      {"type": "reach", "location": "diner", "text": "Ve al Lucky Diner (Northtown)"},
+      {"type": "talk", "npc": "marco", "text": "Habla con Marco"}
+    ],
+    "talk_lines": {"marco": "¡Por fin! Mira, aquí no hay trabajo honrado que pague el alquiler. Toma estas muestras de Glimmer. Kyle te escribirá pronto: entrégale lo que pida y cobra. Mira tu teléfono (Tab)."},
+    "rewards": {"cash": 50, "xp": 20, "items": [["glimmer_bag", 6, {"quality": 0.5, "effects": []}]]},
+    "next": "q_first_deal"
+  },
+  "q_first_deal": {
+    "title": "Primer cliente", "kind": "main", "giver": "marco",
+    "desc": "Kyle quiere comprar. Acepta su pedido en el teléfono, ve al punto de encuentro y entrégale el producto.",
+    "objectives": [
+      {"type": "deal", "count": 1, "text": "Completa una entrega a un cliente"}
+    ],
+    "rewards": {"cash": 0, "xp": 30},
+    "next": "q_setup"
+  },
+  "q_setup": {
+    "title": "Montar el negocio", "kind": "main", "giver": "marco",
+    "desc": "Las muestras se acaban. Compra una maceta en la ferretería de Hank, tierra y esporas en el puesto de Ray, e instala la maceta en tu habitación del motel.",
+    "objectives": [
+      {"type": "buy", "item": "kit_grow_tent", "count": 1, "text": "Compra un kit de maceta (Ferretería de Hank)"},
+      {"type": "buy", "item": "glimmer_spores", "count": 1, "text": "Compra esporas de Glimmer (Puesto de Ray, en el callejón)"},
+      {"type": "install", "station": "grow", "count": 1, "text": "Instala la maceta en un hueco de tu habitación del motel"}
+    ],
+    "rewards": {"cash": 40, "xp": 30, "items": [["soil", 1, {}]]},
+    "next": "q_grow"
+  },
+  "q_grow": {
+    "title": "Mano verde", "kind": "main", "giver": "marco",
+    "desc": "Pon tierra en la maceta, planta las esporas, riégala (rellena la regadera en el fregadero) y espera a que crezca.",
+    "objectives": [
+      {"type": "harvest", "count": 1, "text": "Cosecha tu primera planta"}
+    ],
+    "rewards": {"cash": 0, "xp": 40, "items": [["baggie", 10, {}]]},
+    "next": "q_package"
+  },
+  "q_package": {
+    "title": "Buena presentación", "kind": "main", "giver": "marco",
+    "desc": "Los clientes solo compran producto empaquetado. Compra una estación de empaquetado y prepara tus cogollos.",
+    "objectives": [
+      {"type": "install", "station": "packaging", "count": 1, "text": "Instala una estación de empaquetado"},
+      {"type": "package", "count": 5, "text": "Empaqueta 5 unidades"}
+    ],
+    "rewards": {"cash": 60, "xp": 40},
+    "next": "q_network"
+  },
+  "q_network": {
+    "title": "Red de clientes", "kind": "main", "giver": "marco",
+    "desc": "Necesitas más clientes. Ofrece muestras gratis a los vecinos marcados con '?' o mejora la relación con tus clientes para que te recomienden.",
+    "objectives": [
+      {"type": "customers", "count": 4, "text": "Consigue 4 clientes"}
+    ],
+    "rewards": {"cash": 100, "xp": 60},
+    "next": "q_downtown"
+  },
+  "q_downtown": {
+    "title": "Subiendo de nivel", "kind": "main", "giver": "marco",
+    "desc": "Alcanza el rango Buscavidas para que la policía levante el control hacia Downtown. Allí Vince, el dueño del Neon Lounge, quiere conocerte.",
+    "objectives": [
+      {"type": "rank", "value": 1, "text": "Alcanza el rango Buscavidas"},
+      {"type": "talk", "npc": "vince", "text": "Habla con Vince en el Neon Lounge (Downtown)"}
+    ],
+    "talk_lines": {"vince": "Así que tú eres el nuevo. Mezcla tu producto: a la gente de Downtown le encantan los efectos. La ferretería ya vende estaciones de mezcla."},
+    "rewards": {"cash": 150, "xp": 50},
+    "next": "q_mixing"
+  },
+  "q_mixing": {
+    "title": "Química creativa", "kind": "main", "giver": "vince",
+    "desc": "Instala una estación de mezcla y combina producto con aditivos para añadirle efectos y valor.",
+    "objectives": [
+      {"type": "install", "station": "mixing", "count": 1, "text": "Instala una estación de mezcla"},
+      {"type": "mix", "count": 5, "text": "Mezcla 5 unidades de producto"}
+    ],
+    "rewards": {"cash": 100, "xp": 60},
+    "next": "q_property"
+  },
+  "q_property": {
+    "title": "Un lugar propio", "kind": "main", "giver": "vince",
+    "desc": "La habitación del motel se queda pequeña. Compra una propiedad (cartel 'Se vende' en la puerta).",
+    "objectives": [
+      {"type": "property", "count": 1, "text": "Compra una propiedad"}
+    ],
+    "rewards": {"cash": 0, "xp": 80},
+    "next": "q_staff"
+  },
+  "q_staff": {
+    "title": "Mano de obra", "kind": "main", "giver": "vince",
+    "desc": "Contrata a un empleado desde la app Empleados del teléfono. Necesita una estantería en la propiedad para trabajar.",
+    "objectives": [
+      {"type": "hire", "count": 1, "text": "Contrata a un empleado"}
+    ],
+    "rewards": {"cash": 0, "xp": 60},
+    "next": "q_docks"
+  },
+  "q_docks": {
+    "title": "Cristal azul", "kind": "main", "giver": "lena",
+    "desc": "Alcanza el rango Emprendedor para acceder a Los Muelles. Lena, de Suministros Portuarios, te enseñará a producir Azure.",
+    "objectives": [
+      {"type": "rank", "value": 2, "text": "Alcanza el rango Emprendedor"},
+      {"type": "talk", "npc": "lena", "text": "Habla con Lena en Suministros Portuarios (Los Muelles)"},
+      {"type": "produce", "item": "azure_shard", "count": 10, "text": "Produce 10 Fragmentos Azure en un laboratorio"}
+    ],
+    "talk_lines": {"lena": "Sales minerales más reactivo azul, en un kit de laboratorio. Seis horas después, Azure. Los clientes ricos pagan muy bien por ello."},
+    "rewards": {"cash": 300, "xp": 120},
+    "next": "q_uptown"
+  },
+  "q_uptown": {
+    "title": "Clientela de lujo", "kind": "main", "giver": "marco",
+    "desc": "Alcanza el rango Proveedor para entrar en Uptown, donde viven los clientes más exigentes y generosos.",
+    "objectives": [
+      {"type": "rank", "value": 3, "text": "Alcanza el rango Proveedor"},
+      {"type": "revenue", "amount": 10000, "text": "Ingresa $10.000 en ventas en total"}
+    ],
+    "rewards": {"cash": 500, "xp": 200},
+    "next": "q_kingpin"
+  },
+  "q_kingpin": {
+    "title": "Rey de Redmont", "kind": "main", "giver": "marco",
+    "desc": "Compra la Villa Hillside en Uptown y demuestra que mandas en esta ciudad.",
+    "objectives": [
+      {"type": "own", "property": "uptown_villa", "text": "Compra la Villa Hillside"}
+    ],
+    "rewards": {"cash": 1000, "xp": 500}
+  },
+  "s_lost_package": {
+    "title": "El paquete de Hank", "kind": "side", "giver": "hank",
+    "desc": "A Hank se le cayó un paquete del repartidor en el callejón detrás del motel. Encuéntralo y devuélveselo.",
+    "offer": "Oye, ¿te sobra un rato? Un repartidor perdió un paquete mío por el callejón del motel. Si me lo traes, te pago.",
+    "objectives": [
+      {"type": "pickup", "item": "lost_package", "text": "Encuentra el paquete perdido (callejón del motel)"},
+      {"type": "deliver", "npc": "hank", "item": "lost_package", "count": 1, "text": "Devuelve el paquete a Hank"}
+    ],
+    "spawn_item": {"item": "lost_package", "location": "motel_alley"},
+    "rewards": {"cash": 80, "xp": 25, "items": [["premium_soil", 2, {}]]}
+  },
+  "s_envelope": {
+    "title": "Un sobre para Tony", "kind": "side", "giver": "rosa",
+    "desc": "Rosa, la camarera del diner, necesita que alguien lleve un sobre a Tony, el mecánico del taller.",
+    "offer": "Cielo, ¿me harías un favor? Lleva este sobre a Tony, el del taller. Yo no puedo dejar el turno.",
+    "objectives": [
+      {"type": "deliver", "npc": "tony", "item": "documents", "count": 1, "text": "Entrega el sobre a Tony (taller de Northtown)"}
+    ],
+    "start_items": [["documents", 1, {}]],
+    "rewards": {"cash": 60, "xp": 20}
+  },
+  "s_watch": {
+    "title": "El reloj de Sal", "kind": "side", "giver": "sal",
+    "desc": "Sal busca un reloj antiguo que quedó entre los contenedores del puerto.",
+    "offer": "Me robaron un reloj de bolsillo y el ladrón lo tiró en los contenedores del puerto. ¿Me lo recuperas? Pago bien.",
+    "objectives": [
+      {"type": "pickup", "item": "vintage_watch", "text": "Encuentra el reloj en los contenedores del puerto"},
+      {"type": "deliver", "npc": "sal", "item": "vintage_watch", "count": 1, "text": "Devuelve el reloj a Sal"}
+    ],
+    "spawn_item": {"item": "vintage_watch", "location": "dock_containers"},
+    "rewards": {"cash": 250, "xp": 60}
+  },
+  "s_vince_order": {
+    "title": "Pedido para el Lounge", "kind": "side", "giver": "vince",
+    "desc": "Vince quiere 5 bolsitas de Glimmer para sus clientes VIP.",
+    "offer": "Tengo clientes VIP esta noche. Tráeme 5 bolsitas de Glimmer y te pago por encima del mercado.",
+    "objectives": [
+      {"type": "deliver", "npc": "vince", "item": "glimmer_bag", "count": 5, "text": "Entrega 5 bolsitas de Glimmer a Vince"}
+    ],
+    "rewards": {"cash": 300, "xp": 50}
+  }
+}

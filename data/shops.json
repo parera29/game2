@@ -1,0 +1,32 @@
+{
+  "gasmart": {
+    "name": "Gas-Mart", "keeper": "clerk_gasmart", "open": 6, "close": 24,
+    "items": ["energy_drink", "snack", "baggie", "add_soda", "add_gum", "add_chili", "flashlight"],
+    "buys": []
+  },
+  "hardware": {
+    "name": "Ferretería de Hank", "keeper": "hank", "open": 7, "close": 20,
+    "items": ["watering_can", "soil", "premium_soil", "kit_grow_tent", "kit_storage", "kit_packaging", "kit_mixing", "kit_grow_light"],
+    "buys": []
+  },
+  "ray": {
+    "name": "El puesto de Ray", "keeper": "ray", "open": 10, "close": 26,
+    "items": ["glimmer_spores", "jar", "baggie", "add_bubbles"],
+    "buys": []
+  },
+  "pawn": {
+    "name": "Casa de empeños de Sal", "keeper": "sal", "open": 9, "close": 21,
+    "items": ["backpack", "running_shoes", "add_paint", "flashlight"],
+    "buys": ["*"], "buy_rate": 0.45
+  },
+  "labsupply": {
+    "name": "Suministros Portuarios", "keeper": "lena", "open": 8, "close": 22,
+    "items": ["azure_salts", "azure_reagent", "kit_lab", "jar", "add_honey"],
+    "buys": []
+  },
+  "gadgets": {
+    "name": "Uptown Gadgets", "keeper": "clerk_uptown", "open": 9, "close": 21,
+    "items": ["kit_grow_light", "running_shoes", "backpack", "add_honey", "add_paint", "premium_soil"],
+    "buys": []
+  }
+}

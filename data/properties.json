@@ -1,0 +1,10 @@
+{
+  "motel_room": {"name": "Habitación 4 - Motel Sunset", "district": "northtown", "price": 0, "rent": 40, "slots": 3, "start": true,
+    "desc": "Una habitación barata. Alquiler diario de $40."},
+  "elm_apartment": {"name": "Apartamento de Elm Street", "district": "northtown", "price": 1500, "rent": 0, "slots": 5,
+    "desc": "Un apartamento discreto con espacio para 5 estaciones."},
+  "dock_warehouse": {"name": "Nave del puerto", "district": "docks", "price": 7500, "rent": 0, "slots": 10,
+    "desc": "Una nave industrial enorme con 10 huecos para estaciones."},
+  "uptown_villa": {"name": "Villa Hillside", "district": "uptown", "price": 20000, "rent": 0, "slots": 8,
+    "desc": "Lujo, discreción y estatus. El sueño de cualquier magnate."}
+}
