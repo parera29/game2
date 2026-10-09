@@ -28,6 +28,16 @@ func _process(_delta: float) -> void:
 		for n in GameState.world.npc_root.get_children():
 			if n.npc_id == args[10]:
 				n.interact(GameState.player)
+	if _frames == 8 and args.size() > 9 and args[9] == "stations":
+		var inv: Inventory = GameState.player_inventory
+		for k in ["kit_grow_tent", "kit_mixing", "kit_packaging"]:
+			inv.add(k, 1)
+		Business.install_station("motel_room", 0, "kit_grow_tent")
+		Business.install_station("motel_room", 1, "kit_mixing")
+		Business.install_station("motel_room", 2, "kit_packaging")
+		var st := Business.get_station("motel_room", 0)
+		st.merge({"soil": true, "soil_quality": 0.6, "planted": true, "growth": 0.7, "water": 0.8, "light": true}, true)
+		Events.property_state_changed.emit("motel_room")
 	if _frames == 8 and args.size() > 9 and args[9] == "unlock":
 		GameState.add_xp(9000)
 	if _frames == 10 and GameState.player and args.size() >= 6:

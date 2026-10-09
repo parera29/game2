@@ -38,7 +38,10 @@ referencias rotas.
 2. Pulsa **F5** (o el botón ▶). Se abre el menú principal.
 
 ### Ejecutar desde la línea de comandos
+La primera vez hay que importar el proyecto (el editor lo hace solo al abrirlo; desde la
+terminal hay que hacerlo una vez para generar la caché de clases en `.godot/`):
 ```bash
+godot --headless --path /ruta/a/game2 --import   # solo la primera vez
 godot --path /ruta/a/game2
 ```
 
@@ -54,6 +57,7 @@ plantillas de exportación si Godot lo pide) → **Exportar proyecto**.
 
 ### Pruebas automáticas
 ```bash
+godot --headless --path . --import   # si el proyecto no se ha abierto nunca
 # Prueba de integración del bucle de juego (sale con código 0 si todo pasa)
 godot --headless --path . res://tests/test_runner.tscn
 # Con renderizado real (recomendado, p. ej. con xvfb-run en Linux sin pantalla):

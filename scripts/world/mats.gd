@@ -105,16 +105,3 @@ static func glass() -> StandardMaterial3D:
 	m.metallic = 0.3
 	_cache["glass"] = m
 	return m
-
-
-## Material con textura de texto para carteles (se genera una vez por texto).
-static func sign_label(text: String, bg: Color, fg: Color) -> StandardMaterial3D:
-	var key := "sign|%s|%s|%s" % [text, bg.to_html(), fg.to_html()]
-	if _cache.has(key):
-		return _cache[key]
-	var m := StandardMaterial3D.new()
-	m.albedo_color = bg
-	m.emission_enabled = true
-	m.emission = bg * 0.6
-	_cache[key] = m
-	return m

@@ -20,8 +20,8 @@ func setup(pid: String, slot_index: int) -> void:
 	add_child(_shape)
 	_label = Label3D.new()
 	_label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	_label.pixel_size = 0.004
-	_label.font_size = 48
+	_label.pixel_size = 0.003
+	_label.font_size = 44
 	_label.outline_size = 10
 	_label.position = Vector3(0, 1.9, 0)
 	_label.modulate = Color(1, 1, 1, 0.9)
