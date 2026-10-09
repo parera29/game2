@@ -8,6 +8,17 @@ propiedades, empleados y territorio.
 > Todo el contenido es ficción de juego: "Glimmer" y "Azure" son productos inventados, y
 > todas las operaciones son sistemas simulados dentro del juego.
 
+![Calle de noche](docs/screenshots/night.png)
+
+| | |
+|---|---|
+| ![Menú](docs/screenshots/menu.png) | ![Habitación y HUD](docs/screenshots/room.png) |
+| ![Teléfono](docs/screenshots/phone.png) | ![Mapa](docs/screenshots/map.png) |
+| ![Estaciones](docs/screenshots/stations.png) | ![Los Muelles](docs/screenshots/docks.png) |
+
+(Capturas generadas automáticamente con `tests/screenshot_runner.tscn` usando el renderizador
+de compatibilidad por software; en una GPU con Forward+ se añaden SSAO y mejores sombras.)
+
 ---
 
 ## 1. Tecnología elegida
