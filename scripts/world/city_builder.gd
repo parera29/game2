@@ -81,6 +81,31 @@ func build() -> void:
 	_barriers()
 	_outer()
 	_traffic()
+	apply_culling(w)
+
+
+## Optimización: los objetos pequeños dejan de dibujarse a cierta distancia y las
+## luces interiores se desvanecen. Los edificios grandes siempre se dibujan.
+static func apply_culling(parent: Node) -> void:
+	for n in parent.find_children("*", "GeometryInstance3D", true, false):
+		var gi := n as GeometryInstance3D
+		if gi.visibility_range_end > 0.0:
+			continue
+		if gi is Label3D or gi is Sprite3D:
+			gi.visibility_range_end = 120.0
+			continue
+		var longest := gi.get_aabb().size[gi.get_aabb().size.max_axis_index()]
+		if longest < 1.5:
+			gi.visibility_range_end = 60.0
+		elif longest < 4.0:
+			gi.visibility_range_end = 110.0
+		elif longest < 12.0:
+			gi.visibility_range_end = 200.0
+	for n in parent.find_children("*", "OmniLight3D", true, false):
+		var l := n as OmniLight3D
+		l.distance_fade_enabled = true
+		l.distance_fade_begin = 60.0
+		l.distance_fade_length = 15.0
 
 
 # ================================================================== Base

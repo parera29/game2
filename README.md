@@ -228,14 +228,17 @@ Lo siguiente **no** está implementado (o solo parcialmente) y no se presenta co
   capturadas); audio y música sintetizados (sin grabaciones ni voces).
 - Solo idioma español.
 - El rendimiento se ha comprobado con renderizado por software (llvmpipe); no se ha podido
-  medir en una GPU real durante el desarrollo. Las opciones gráficas permiten ajustarlo.
+  medir en una GPU real durante el desarrollo. La ciudad genera ~6.100 mallas, de las cuales
+  ~5.700 tienen distancia de dibujado por tamaño, y las luces interiores se desvanecen con la
+  distancia. Las opciones gráficas (sombras, escala 3D, distancia de visión, SSAO, MSAA)
+  permiten ajustarlo en equipos modestos.
 
 ---
 
 ## 7. Pruebas realizadas
 
 - **Compilación**: todos los scripts se importan sin errores (`godot --headless --editor --quit`).
-- **Prueba de integración automatizada** (`tests/test_runner.tscn`, 68 comprobaciones,
+- **Prueba de integración automatizada** (`tests/test_runner.tscn`, 94 comprobaciones,
   todas OK con renderizado OpenGL real), que recorre:
   partida nueva → abrir puerta → entrar al diner (trigger de ubicación) → diálogo con Marco →
   recompensa → pedido de Kyle → el NPC camina a la cita → entrega por diálogo y cobro →
@@ -244,8 +247,12 @@ Lo siguiente **no** está implementado (o solo parcialmente) y no se presenta co
   modificar estado → **cargar** (recarga de escena) → verificar dinero, inventario, día,
   estaciones, misiones, relaciones y posición → detención con multa y confiscación →
   agente que detecta al jugador en toque de queda, se acerca y le registra → tráfico activo →
-  subida de rango y apertura de la barrera de Downtown → apertura de todas las ventanas de UI
-  y todas las apps del teléfono.
+  subida de rango y apertura de la barrera de Downtown → mezcla con aditivo y aumento de valor
+  → compra de propiedad → estantería → contratación de botánica y empaquetador que trabajan
+  solos → laboratorio Azure → venta en la casa de empeños → ingreso y retirada en el banco →
+  misión secundaria con objeto en el mundo (recoger y entregar) → contraoferta aceptada y
+  contraoferta abusiva con abandono del cliente → testigos que denuncian → atracador →
+  dormir hasta las 7:00 con autoguardado → apertura de todas las ventanas de UI y apps del teléfono.
 - **Capturas de pantalla** automáticas (`tests/screenshot_runner.tscn`) para revisar calles,
   interiores, noche, HUD, teléfono, mapa e inventario.
 

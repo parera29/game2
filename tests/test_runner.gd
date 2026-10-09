@@ -52,6 +52,12 @@ func _run() -> void:
 	check(w.npc_root.get_child_count() > 40, "NPC creados (%d)" % w.npc_root.get_child_count())
 	check(w.doors.size() >= 12, "puertas (%d)" % w.doors.size())
 	check(get_tree().get_nodes_in_group("police").size() >= 5, "policías patrullando")
+	var meshes := get_tree().root.find_children("*", "MeshInstance3D", true, false)
+	var culled := 0
+	for m in meshes:
+		if (m as GeometryInstance3D).visibility_range_end > 0.0:
+			culled += 1
+	print("    (instancias de malla: %d, con distancia de culling: %d, luces: %d)" % [meshes.size(), culled, get_tree().root.find_children("*", "Light3D", true, false).size()])
 
 	# --- Puerta de la habitación del motel (propiedad alquilada) debe abrirse
 	var motel_door: Door = null
@@ -245,6 +251,126 @@ func _run() -> void:
 		if (n as Node3D).visible:
 			barrier_open = false
 	check(barrier_open, "barrera de Downtown retirada")
+
+	# --- Mezcla
+	var inv: Inventory = GameState.player_inventory
+	GameState.cash = 30000
+	inv.add("kit_mixing", 1)
+	check(Business.install_station("motel_room", 2, "kit_mixing"), "estación de mezcla instalada")
+	inv.add("glimmer_bud", 5, {"quality": 0.6, "effects": []})
+	inv.add("add_chili", 5)
+	var bud_slot := inv.find_first(func(s): return s["id"] == "glimmer_bud")
+	var mix_msg := Business.start_mix("motel_room", 2, bud_slot, "add_chili")
+	check(Business.get_station("motel_room", 2)["busy"], "mezcla iniciada: %s" % mix_msg)
+	GameState.skip_minutes(12)
+	var col_msg := Business.collect_output("motel_room", 2, inv)
+	var mixed_i := inv.find_first(func(s): return s["id"] == "glimmer_bud" and (s["data"].get("effects", []) as Array).has("zesty"))
+	check(mixed_i >= 0, "producto mezclado con efecto Picante (%s)" % col_msg)
+	var v_plain := ItemDB.unit_value("glimmer", {"quality": 0.6, "effects": []})
+	var v_mix := ItemDB.unit_value("glimmer", inv.get_slot(mixed_i)["data"])
+	check(v_mix > v_plain, "el efecto aumenta el valor ($%d -> $%d)" % [v_plain, v_mix])
+
+	# --- Compra de propiedad, laboratorio y empleados
+	check(Business.buy_property("elm_apartment"), "apartamento comprado")
+	check(Business.owns("elm_apartment"), "la propiedad consta como propia")
+	inv.add("kit_storage", 1)
+	check(Business.install_station("elm_apartment", 0, "kit_storage"), "estantería instalada")
+	inv.add("kit_grow_tent", 1)
+	Business.install_station("elm_apartment", 1, "kit_grow_tent")
+	var store := Business.storage_inventory("elm_apartment", 0)
+	store.add("soil", 3)
+	store.add("glimmer_spores", 3)
+	store.add("glimmer_bud", 10, {"quality": 0.5, "effects": []})
+	store.add("baggie", 20)
+	check(Business.hire("nina", "elm_apartment"), "botánica contratada")
+	check(Business.hire("leo", "elm_apartment"), "empaquetador contratado")
+	GameState.minute = 9 * 60 + 59
+	GameState.skip_minutes(2)
+	var gst := Business.get_station("elm_apartment", 1)
+	check(gst["planted"] and float(gst["water"]) > 0.5, "la botánica planta y riega sola")
+	check(store.count("glimmer_bag") >= 10, "el empaquetador empaqueta solo (%d bolsitas)" % store.count("glimmer_bag"))
+	inv.add("kit_lab", 1)
+	check(Business.install_station("elm_apartment", 2, "kit_lab"), "laboratorio instalado")
+	inv.add("azure_salts", 1)
+	inv.add("azure_reagent", 1)
+	var lab_msg := Business.start_lab("elm_apartment", 2, inv)
+	GameState.skip_minutes(Business.LAB_MINUTES + 1)
+	Business.collect_output("elm_apartment", 2, inv)
+	check(inv.count("azure_shard") >= 10, "laboratorio produce Azure (%s)" % lab_msg)
+	check(GameState.flags.get("azure_known", false), "Azure desbloqueado para los clientes")
+
+	# --- Venta en la casa de empeños y cajero
+	inv.add("scrap_metal", 2)
+	GameState.minute = 12 * 60
+	_ui().open("shop", {"shop": "pawn"})
+	await frames(2)
+	var cash0 := GameState.cash
+	_ui().current._sell("scrap_metal", 2)
+	_ui().close()
+	check(GameState.cash == cash0 + 24, "chatarra vendida en la casa de empeños")
+	var bank0 := GameState.bank
+	check(GameState.deposit(1000) and GameState.bank == bank0 + 1000, "ingreso en el banco")
+	check(GameState.withdraw(500) and GameState.bank == bank0 + 500, "retirada del banco")
+
+	# --- Misión secundaria con objeto en el mundo
+	Quests.start("s_lost_package")
+	await frames(3)
+	var pkg: WorldItem = null
+	for wi in get_tree().get_nodes_in_group("world_items"):
+		if (wi as WorldItem).item_id == "lost_package":
+			pkg = wi
+	check(pkg != null, "paquete perdido colocado en el callejón")
+	if pkg:
+		pkg.interact(GameState.player)
+	await frames(3)
+	check(Quests.current_objective("s_lost_package").get("type", "") == "deliver", "paquete recogido: toca entregarlo")
+	check(Quests.try_deliver("s_lost_package") and Quests.is_completed("s_lost_package"), "paquete entregado a Hank: misión completada")
+
+	# --- Contraoferta
+	Customers.state["meg"]["order"] = {}
+	Customers.state["meg"]["deal"] = {}
+	Customers.create_order("meg", 2)
+	var willing := Customers.max_willing("meg", "glimmer")
+	var r_low := Customers.counter_offer("meg", int(willing * 2 * 0.9))
+	check(r_low == "accepted" and Customers.has_deal("meg"), "contraoferta dentro del precio aceptada (%s)" % r_low)
+	Customers.state["meg"]["deal"] = {}
+	Customers.create_order("meg", 2)
+	var r_hi := Customers.counter_offer("meg", willing * 10)
+	var r_hi2 := Customers.counter_offer("meg", willing * 10)
+	check(r_hi == "rejected" and r_hi2 == "quit", "contraoferta abusiva rechazada y el cliente abandona (%s, %s)" % [r_hi, r_hi2])
+
+	# --- Testigos, atracador y dormir con autoguardado
+	Police.reset()
+	var ped: NPC = null
+	for n in w.npc_root.get_children():
+		if n is NPC and n.role == "pedestrian" and n.visible and n.district == "northtown":
+			ped = n
+			break
+	if ped:
+		GameState.player.teleport(ped.global_position + Vector3(2, 0.2, 0), 0.0)
+		await frames(3)
+		for i in 6:
+			Police.report_illegal_activity(GameState.player.global_position, 18.0, "venta")
+		GameState.skip_minutes(20)
+		check(Police.suspicion > 0.0, "los testigos aumentan la sospecha (%.0f)" % Police.suspicion)
+	w.spawn_mugger()
+	await frames(3)
+	var mug := 0
+	for n in w.npc_root.get_children():
+		if n is NPC and n.role == "mugger":
+			mug += 1
+	check(mug == 1, "aparece un atracador")
+	Police.reset()
+	GameState.minute = 21 * 60
+	SaveSystem.delete_save("auto")
+	_ui().open("sleep", {})
+	await frames(2)
+	_ui().current._sleep()
+	await get_tree().create_timer(3.0).timeout
+	check(GameState.hour() == 7, "dormir avanza hasta las 7:00")
+	check(SaveSystem.has_save("auto"), "autoguardado al dormir")
+	if _ui().current:
+		_ui().close()
 
 	# --- Todas las ventanas de UI se abren sin errores
 	for ui_name in ["inventory", "phone", "map", "pause", "settings", "saveload", "help", "atm", "sleep"]:

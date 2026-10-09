@@ -47,6 +47,7 @@ var stats: Dictionary = {}
 var player_inventory: Inventory
 var listing_prices: Dictionary = {"glimmer": 40, "azure": 95}
 var slept_today := true
+var _sleeping := false
 
 var world: Node = null          # referencia al mundo cargado (World)
 var player: Node = null
@@ -111,7 +112,7 @@ func _advance_minute() -> void:
 	if m % 60 == 0:
 		Events.hour_passed.emit(m / 60, day)
 	_check_lockdowns()
-	if m == PASS_OUT_MINUTE and not slept_today:
+	if m == PASS_OUT_MINUTE and not slept_today and not _sleeping:
 		_pass_out()
 
 
@@ -156,7 +157,9 @@ func sleep() -> void:
 	var mins := target - cur
 	if mins <= 0:
 		mins += 1440
+	_sleeping = true
 	skip_minutes(mins)
+	_sleeping = false
 	slept_today = true
 	Events.day_started.emit(day)
 	Events.toast("Has dormido. %s, día %d - %s" % [weekday_name(), day, time_string()], "info")
