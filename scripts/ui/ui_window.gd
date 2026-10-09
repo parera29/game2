@@ -9,15 +9,15 @@ var dim := true
 
 
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	if dim:
-		var bg := ColorRect.new()
-		bg.color = Color(0, 0, 0, 0.45)
-		bg.set_anchors_preset(Control.PRESET_FULL_RECT)
-		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		add_child(bg)
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0, 0.45)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(bg)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	build()
+	bg.visible = dim
 
 
 func build() -> void:

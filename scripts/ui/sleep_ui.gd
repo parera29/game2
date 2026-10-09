@@ -20,8 +20,8 @@ func build() -> void:
 func _sleep() -> void:
 	_fade = ColorRect.new()
 	_fade.color = Color(0, 0, 0, 0)
-	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_fade)
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var tw := create_tween()
 	tw.tween_property(_fade, "color:a", 1.0, 0.8)
 	tw.tween_callback(func() -> void:

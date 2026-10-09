@@ -262,7 +262,7 @@ func shell(bx: int, bz: int, r: Rect2, floors: int, ext: Material, opts: Diction
 	var cx := (p0.x + p1.x) * 0.5
 	var cz := (p0.z + p1.z) * 0.5
 	Geo.box(node, Vector3(ww, 0.25, dd), Vector3(cx, y0 + h + 0.125, cz), ext)
-	Geo.box(node, Vector3(ww - 2 * t, 0.02, dd - 2 * t), Vector3(cx, y0 + h - 0.01, cz), Mats.color(opts.get("ceiling_col", Color(0.9, 0.9, 0.88)), 0.9), false, 0.0, false)
+	Geo.box(node, Vector3(ww - 2 * t, 0.02, dd - 2 * t), Vector3(cx, y0 + h - 0.01, cz), _ceiling_mat(opts.get("ceiling_col", Color(0.9, 0.88, 0.84))), false, 0.0, false)
 	var top := y0 + h + 0.25
 	if floors > 1:
 		var uh := (floors - 1) * 3.2
@@ -274,9 +274,9 @@ func shell(bx: int, bz: int, r: Rect2, floors: int, ext: Material, opts: Diction
 	# Iluminación interior
 	var light := OmniLight3D.new()
 	light.position = Vector3(cx, y0 + h - 0.5, cz)
-	light.omni_range = maxf(ww, dd) * 0.85
-	light.omni_attenuation = 0.7
-	light.light_energy = opts.get("light_energy", 1.3)
+	light.omni_range = maxf(ww, dd) * 1.1
+	light.omni_attenuation = 0.55
+	light.light_energy = opts.get("light_energy", 1.5)
 	light.light_color = opts.get("light_color", Color(1.0, 0.92, 0.8))
 	light.light_specular = 0.3
 	node.add_child(light)
@@ -335,6 +335,18 @@ func shell(bx: int, bz: int, r: Rect2, floors: int, ext: Material, opts: Diction
 	_avoid_spot(bx, bz, door_center)
 	return {"node": node, "p0": p0, "p1": p1, "y0": y0, "door": door, "door_pos": door_center, "normal": nrm, "zone": zone,
 		"in0": Vector3(p0.x + t, y0, p0.z + t), "in1": Vector3(p1.x - t, y0, p1.z - t)}
+
+
+## Techo interior con una ligera emisión cálida: simula la luz rebotada y evita
+## que el ambiente del cielo lo tiña de azul.
+func _ceiling_mat(col: Color) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = col
+	m.roughness = 0.9
+	m.emission_enabled = true
+	m.emission = col * Color(1.0, 0.92, 0.8)
+	m.emission_energy_multiplier = 0.35
+	return m
 
 
 func _map_rect(p0: Vector3, p1: Vector3, col: Color) -> void:

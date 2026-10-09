@@ -101,7 +101,7 @@ func _buy_row(id: String) -> Control:
 	h.add_child(UITheme.label("(tienes %d)" % owned, 13, UITheme.TEXT_DIM))
 	h.add_child(UITheme.label(UITheme.money(price), 18, UITheme.MONEY))
 	if locked:
-		h.add_child(UITheme.label("🔒 Rango: %s" % GameState.rank_name(req_rank), 14, UITheme.DANGER))
+		h.add_child(UITheme.label("Bloqueado · rango %s" % GameState.rank_name(req_rank), 14, UITheme.DANGER))
 		return h
 	var spin := SpinBox.new()
 	spin.min_value = 1

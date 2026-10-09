@@ -77,7 +77,8 @@ func _ready() -> void:
 	flashlight.position = Vector3(0.2, -0.15, 0)
 	camera.add_child(flashlight)
 	hand = Node3D.new()
-	hand.position = Vector3(0.38, -0.32, -0.55)
+	hand.position = Vector3(0.42, -0.36, -0.75)
+	hand.scale = Vector3.ONE * 0.6
 	camera.add_child(hand)
 	apply_settings()
 	Events.settings_changed.connect(apply_settings)
@@ -238,7 +239,7 @@ func _update_bob(delta: float, on_floor: bool, hspeed: float) -> void:
 		camera.position.x = cos(_bob_t) * 0.025 * clampf(hspeed / 4.0, 0.0, 1.5)
 	else:
 		camera.position = Vector3.ZERO
-	hand.position.y = -0.32 + sin(_bob_t * 2.0) * 0.01
+	hand.position.y = -0.36 + sin(_bob_t * 2.0) * 0.01
 
 
 func _process(_delta: float) -> void:

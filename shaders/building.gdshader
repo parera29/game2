@@ -95,8 +95,8 @@ void fragment() {
 					rough = 0.1;
 					metal = 0.2;
 					vec3 inner = window_light * (0.7 + 0.3 * hash(id * 3.1 + seed));
-					emit = inner * lit * night_factor * 1.4;
-					col = mix(col, inner * 0.35, lit * night_factor);
+					emit = inner * lit * night_factor * 0.75;
+					col = mix(col, inner * 0.25, lit * night_factor);
 				}
 			} else if (f.y < lo.y && f.y > lo.y - 0.05 && f.x > lo.x - 0.04 && f.x < hi.x + 0.04) {
 				col = trim_color;

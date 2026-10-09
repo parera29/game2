@@ -33,11 +33,7 @@ func build() -> void:
 	npc = payload.get("npc")
 	var panel := PanelContainer.new()
 	panel.add_theme_stylebox_override("panel", UITheme.panel_style(UITheme.BG, 14, Color(1, 1, 1, 0.08)))
-	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	panel.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	panel.custom_minimum_size = Vector2(760, 0)
-	panel.position = Vector2(-380, -60)
 	add_child(panel)
 	var m := MarginContainer.new()
 	for s in ["left", "right", "top", "bottom"]:
@@ -58,9 +54,19 @@ func build() -> void:
 	v.add_child(_opts)
 	npc.begin_talk()
 	Events.npc_talked.emit(npc.npc_id)
+	_panel = panel
 	_show(_root())
-	await get_tree().process_frame
-	panel.position = Vector2((get_viewport_rect().size.x - panel.size.x) * 0.5, get_viewport_rect().size.y - panel.size.y - 40)
+
+
+var _panel: PanelContainer
+
+
+func _place_panel() -> void:
+	if _panel == null:
+		return
+	var vs := get_viewport_rect().size
+	_panel.reset_size()
+	_panel.position = Vector2((vs.x - _panel.size.x) * 0.5, vs.y - _panel.size.y - 40.0)
 
 
 func _exit_tree() -> void:
@@ -69,6 +75,7 @@ func _exit_tree() -> void:
 
 
 func _process(_d: float) -> void:
+	_place_panel()
 	if not is_instance_valid(npc) or (GameState.player and npc.global_position.distance_to(GameState.player.global_position) > 6.0):
 		close()
 

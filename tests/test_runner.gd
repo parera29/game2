@@ -204,6 +204,38 @@ func _run() -> void:
 	check(GameState.player.global_position.distance_to(w.police_station_pos) < 2.0, "trasladado a la comisaría")
 	_ui().close()
 
+	# --- IA policial: toque de queda, aproximación y registro
+	Police.reset()
+	GameState.minute = 23 * 60
+	GameState.player_inventory.add("glimmer_bag", 3, {"quality": 0.5, "effects": []})
+	var cop: NPC = null
+	for c in get_tree().get_nodes_in_group("police"):
+		if (c as NPC).district == "northtown":
+			cop = c
+			break
+	check(cop != null, "hay un agente en Northtown")
+	# Colocamos al jugador delante del agente, en la calle
+	var fwd: Vector3 = -cop.global_basis.z
+	GameState.player.teleport(cop.global_position + fwd * 6.0 + Vector3.UP * 0.1, 0.0)
+	await frames(40)
+	check(Police.wanted >= Police.Wanted.INVESTIGATING, "el agente detecta al jugador en toque de queda")
+	check(cop.state in ["approach", "searching"], "el agente se acerca para registrar (estado %s)" % cop.state)
+	var waited := 0
+	while Police.search_progress() < 0.0 and waited < 600:
+		await frames(5)
+		waited += 5
+	check(Police.search_progress() >= 0.0, "comienza el registro corporal")
+	var arrests_before := int(GameState.stats["arrests"])
+	waited = 0
+	while Police.search_progress() >= 0.0 and waited < 400:
+		await frames(5)
+		waited += 5
+	check(Police.search_progress() < 0.0, "el registro termina")
+	print("    (resultado del registro: %s)" % ("detenido" if int(GameState.stats["arrests"]) > arrests_before else "limpio"))
+	_ui().close()
+	GameState.minute = 12 * 60
+	check(get_tree().get_nodes_in_group("traffic").size() >= 4, "coches de tráfico en circulación")
+
 	# --- Rango y desbloqueo de distrito
 	GameState.add_xp(200)
 	await frames(3)

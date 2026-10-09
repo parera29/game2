@@ -25,6 +25,10 @@ func _process(_delta: float) -> void:
 		GameState.player.teleport(Vector3(float(args[0]), float(args[1]), float(args[2])), deg_to_rad(float(args[3])))
 		GameState.player.head.rotation.x = deg_to_rad(float(args[4]))
 		GameState.minute = float(args[5]) * 60.0
+	if _frames == 60 and args.size() > 7 and args[7] != "":
+		var ui := get_tree().get_first_node_in_group("ui_manager")
+		if ui:
+			ui.open(args[7], {"app": args[8]} if args.size() > 8 else {})
 	if _frames == 90:
 		var img := get_viewport().get_texture().get_image()
 		var out := args[6] if args.size() > 6 else "user://shot.png"

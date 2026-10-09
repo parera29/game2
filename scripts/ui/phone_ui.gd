@@ -31,12 +31,9 @@ func build() -> void:
 	frame.content_margin_top = 14
 	frame.content_margin_bottom = 14
 	phone.add_theme_stylebox_override("panel", frame)
-	phone.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	phone.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-	phone.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	phone.custom_minimum_size = Vector2(440, 740)
-	phone.position = Vector2(-470, -770)
 	add_child(phone)
+	_phone = phone
 	var inner := PanelContainer.new()
 	inner.add_theme_stylebox_override("panel", UITheme.panel_style(Color(0.09, 0.1, 0.13, 1.0), 18, Color(0, 0, 0, 0)))
 	phone.add_child(inner)
@@ -68,7 +65,12 @@ func build() -> void:
 	Audio.play("click", -6.0)
 
 
+var _phone: PanelContainer
+
+
 func _process(_d: float) -> void:
+	var vs := get_viewport_rect().size
+	_phone.position = Vector2(vs.x - _phone.size.x - 30.0, maxf(10.0, vs.y - _phone.size.y - 30.0))
 	_status.text = "%s %s   %s" % [GameState.weekday_name().substr(0, 3), GameState.time_string(), UITheme.money(GameState.cash)]
 
 

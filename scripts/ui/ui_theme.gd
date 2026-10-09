@@ -127,7 +127,6 @@ static func title_bar(text: String, on_close: Callable) -> HBoxContainer:
 static func window(size: Vector2, title: String, on_close: Callable) -> Dictionary:
 	var root := PanelContainer.new()
 	root.custom_minimum_size = size
-	root.set_anchors_preset(Control.PRESET_CENTER)
 	root.add_theme_stylebox_override("panel", panel_style(BG, 14, Color(1, 1, 1, 0.08)))
 	var margin := MarginContainer.new()
 	for side in ["left", "right", "top", "bottom"]:

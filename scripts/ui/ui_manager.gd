@@ -34,17 +34,17 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	add_to_group("ui_manager")
 	_root = Control.new()
-	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.theme = UITheme.get_theme()
 	add_child(_root)
+	_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hud = HUD.new()
 	hud.process_mode = Node.PROCESS_MODE_PAUSABLE
 	_root.add_child(hud)
 	_modal_root = Control.new()
-	_modal_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_modal_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_root.add_child(_modal_root)
+	_modal_root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	Events.request_ui.connect(open)
 	Events.player_arrested.connect(func(fine: int, items: int) -> void: open.call_deferred("arrested", {"fine": fine, "items": items}))
 	_capture_mouse(true)

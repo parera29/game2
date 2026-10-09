@@ -33,16 +33,44 @@ var waypoint_name := ""
 var _deal_timer := 0.0
 
 
+var _layout_top: HBoxContainer
+var _layout_mid: HBoxContainer
+var _layout_bottom: VBoxContainer
+
+
 func _ready() -> void:
-	set_anchors_preset(Control.PRESET_FULL_RECT)
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var margin := MarginContainer.new()
+	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for side in ["left", "right", "top", "bottom"]:
+		margin.add_theme_constant_override("margin_" + side, 16)
+	add_child(margin)
+	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var col := VBoxContainer.new()
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	margin.add_child(col)
+	_layout_top = HBoxContainer.new()
+	_layout_top.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(_layout_top)
+	_layout_mid = HBoxContainer.new()
+	_layout_mid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layout_mid.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(_layout_mid)
+	_layout_bottom = VBoxContainer.new()
+	_layout_bottom.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layout_bottom.alignment = BoxContainer.ALIGNMENT_END
+	col.add_child(_layout_bottom)
 	_build_top_left()
-	_build_top_right()
+	_layout_top.add_child(_spacer())
 	_build_heat()
-	_build_center()
-	_build_hotbar()
-	_build_right()
+	_layout_top.add_child(_spacer())
+	_build_top_right()
 	_build_notes()
+	_layout_mid.add_child(_spacer())
+	_build_right()
+	_build_hotbar()
+	_build_center()
 	Events.notify.connect(_on_notify)
 	Events.money_changed.connect(func(_c: int, _b: int) -> void: _refresh_money())
 	Events.xp_changed.connect(func(_x: int, _r: int) -> void: _refresh_money())
@@ -61,18 +89,24 @@ func _ready() -> void:
 	_refresh_deals()
 
 
-func _panel(pos_preset: int) -> PanelContainer:
+func _spacer() -> Control:
+	var c := Control.new()
+	c.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return c
+
+
+func _panel(parent: Control) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", UITheme.panel_style(Color(0.05, 0.06, 0.08, 0.72), 10, Color(1, 1, 1, 0.05)))
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(p)
-	p.set_anchors_preset(pos_preset)
+	p.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	parent.add_child(p)
 	return p
 
 
 func _build_top_left() -> void:
-	var p := _panel(Control.PRESET_TOP_LEFT)
-	p.position = Vector2(16, 16)
+	var p := _panel(_layout_top)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 0)
 	p.add_child(v)
@@ -83,9 +117,7 @@ func _build_top_left() -> void:
 
 
 func _build_top_right() -> void:
-	var p := _panel(Control.PRESET_TOP_RIGHT)
-	p.position = Vector2(-16, 16)
-	p.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	var p := _panel(_layout_top)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 2)
 	p.add_child(v)
@@ -103,8 +135,10 @@ func _build_top_right() -> void:
 
 
 func _build_heat() -> void:
-	_heat_box = _panel(Control.PRESET_CENTER_TOP)
-	_heat_box.position = Vector2(-150, 16)
+	var holder := VBoxContainer.new()
+	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layout_top.add_child(holder)
+	_heat_box = _panel(holder)
 	_heat_box.custom_minimum_size = Vector2(300, 0)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 4)
@@ -115,8 +149,7 @@ func _build_heat() -> void:
 	_heat_bar.custom_minimum_size = Vector2(280, 8)
 	_heat_bar.show_percentage = false
 	_heat_bar.max_value = 100.0
-	var fill := UITheme.panel_style(UITheme.DANGER, 4, Color(0, 0, 0, 0))
-	_heat_bar.add_theme_stylebox_override("fill", fill)
+	_heat_bar.add_theme_stylebox_override("fill", UITheme.panel_style(UITheme.DANGER, 4, Color(0, 0, 0, 0)))
 	v.add_child(_heat_bar)
 	_search_bar = ProgressBar.new()
 	_search_bar.custom_minimum_size = Vector2(280, 8)
@@ -125,44 +158,46 @@ func _build_heat() -> void:
 	_search_bar.visible = false
 	v.add_child(_search_bar)
 	_waypoint = UITheme.shadow_label("", 16, UITheme.WARN)
-	_waypoint.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_waypoint.position = Vector2(-200, 110)
-	_waypoint.custom_minimum_size = Vector2(400, 0)
 	_waypoint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_waypoint.custom_minimum_size = Vector2(300, 0)
 	_waypoint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(_waypoint)
+	holder.add_child(_waypoint)
 
 
 func _build_center() -> void:
 	_crosshair = Control.new()
-	_crosshair.set_anchors_preset(Control.PRESET_CENTER)
 	_crosshair.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_crosshair.draw.connect(func() -> void:
 		_crosshair.draw_circle(Vector2.ZERO, 3.5, Color(0, 0, 0, 0.5))
 		_crosshair.draw_circle(Vector2.ZERO, 2.2, Color(1, 1, 1, 0.9)))
 	add_child(_crosshair)
 	_prompt = UITheme.shadow_label("", 19, Color.WHITE)
-	_prompt.set_anchors_preset(Control.PRESET_CENTER)
-	_prompt.position = Vector2(-300, 28)
-	_prompt.custom_minimum_size = Vector2(600, 0)
+	_prompt.custom_minimum_size = Vector2(800, 0)
 	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_prompt.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_prompt)
 	_fps = UITheme.shadow_label("", 14, UITheme.TEXT_DIM)
-	_fps.position = Vector2(16, 90)
+	_fps.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_fps)
 
 
 func _build_hotbar() -> void:
+	var bottom_row := HBoxContainer.new()
+	bottom_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layout_bottom.add_child(bottom_row)
+	_hint = UITheme.shadow_label("Tab: teléfono\nI: inventario\nM: mapa\nEsc: menú", 13, UITheme.TEXT_DIM)
+	_hint.size_flags_vertical = Control.SIZE_SHRINK_END
+	_hint.custom_minimum_size = Vector2(160, 0)
+	bottom_row.add_child(_hint)
+	bottom_row.add_child(_spacer())
 	var box := VBoxContainer.new()
-	box.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	box.grow_horizontal = Control.GROW_DIRECTION_BOTH
-	box.grow_vertical = Control.GROW_DIRECTION_BEGIN
-	box.position = Vector2(-300, -110)
-	box.custom_minimum_size = Vector2(600, 0)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	box.alignment = BoxContainer.ALIGNMENT_END
-	add_child(box)
+	bottom_row.add_child(box)
+	bottom_row.add_child(_spacer())
+	var right_pad := Control.new()
+	right_pad.custom_minimum_size = Vector2(160, 0)
+	right_pad.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bottom_row.add_child(right_pad)
 	_held_name = UITheme.shadow_label("", 17, Color.WHITE)
 	_held_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(_held_name)
@@ -179,9 +214,11 @@ func _build_hotbar() -> void:
 		_slots.append(s)
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	box.add_child(row)
 	_stamina = ProgressBar.new()
 	_stamina.custom_minimum_size = Vector2(260, 6)
+	_stamina.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_stamina.show_percentage = false
 	_stamina.max_value = 100.0
 	_stamina.add_theme_stylebox_override("fill", UITheme.panel_style(Color(0.95, 0.85, 0.3), 3, Color(0, 0, 0, 0)))
@@ -191,9 +228,8 @@ func _build_hotbar() -> void:
 
 
 func _build_right() -> void:
-	var p := _panel(Control.PRESET_CENTER_RIGHT)
-	p.position = Vector2(-16, -120)
-	p.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	var p := _panel(_layout_mid)
+	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	p.custom_minimum_size = Vector2(300, 0)
 	var v := VBoxContainer.new()
 	v.add_theme_constant_override("separation", 4)
@@ -209,20 +245,15 @@ func _build_right() -> void:
 	_deals = VBoxContainer.new()
 	_deals.add_theme_constant_override("separation", 2)
 	v.add_child(_deals)
-	_hint = UITheme.shadow_label("Tab: teléfono · I: inventario · M: mapa · Esc: menú", 13, UITheme.TEXT_DIM)
-	_hint.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	_hint.position = Vector2(16, -30)
-	add_child(_hint)
 
 
 func _build_notes() -> void:
 	_notes = VBoxContainer.new()
-	_notes.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-	_notes.position = Vector2(16, -60)
 	_notes.custom_minimum_size = Vector2(420, 0)
+	_notes.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_notes.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_notes.add_theme_constant_override("separation", 6)
-	add_child(_notes)
+	_layout_mid.add_child(_notes)
 
 
 # ------------------------------------------------------------------ Actualización
@@ -234,6 +265,11 @@ func set_modal(v: bool) -> void:
 
 
 func _process(delta: float) -> void:
+	var vs := get_viewport_rect().size
+	_crosshair.position = vs * 0.5
+	_crosshair.queue_redraw()
+	_prompt.position = Vector2(vs.x * 0.5 - 400.0, vs.y * 0.5 + 26.0)
+	_fps.position = Vector2(vs.x - 110.0, vs.y - 30.0)
 	_clock.text = "%s  %s · Día %d" % [GameState.weekday_name(), GameState.time_string(), GameState.day]
 	var p := GameState.player
 	if p:

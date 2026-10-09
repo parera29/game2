@@ -108,9 +108,6 @@ var _centered := false
 
 
 func _draw() -> void:
-	if not _centered and size.x > 10.0 and GameState.player:
-		_centered = true
-		_center_on(GameState.player.global_position)
 	draw_rect(Rect2(Vector2.ZERO, size), Color(0.2, 0.3, 0.18))
 	# Agua
 	_rect_world(Rect2(-200, 214, 305, 200), Color(0.12, 0.25, 0.35))
@@ -137,7 +134,7 @@ func _draw() -> void:
 			var why := "Rango: %s" % GameState.rank_name(int(GameState.DISTRICTS[d]["rank"]))
 			if GameState.is_locked_down(d):
 				why = "Cerrado por la policía"
-			_text(mr.get_center() + Vector2(0, -8), "🔒 " + String(GameState.DISTRICTS[d]["name"]), 16, Color(1, 0.8, 0.4))
+			_text(mr.get_center() + Vector2(0, -8), String(GameState.DISTRICTS[d]["name"]) + " (CERRADO)", 16, Color(1, 0.8, 0.4))
 			_text(mr.get_center() + Vector2(0, 12), why, 13, Color(0.9, 0.9, 0.9))
 		else:
 			_text(mr.position + Vector2(mr.size.x * 0.5, 14), String(GameState.DISTRICTS[d]["name"]).to_upper(), 13, Color(1, 1, 1, 0.55))
